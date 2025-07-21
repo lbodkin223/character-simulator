@@ -17,5 +17,13 @@
   "relationship": {
     "trust": 5,
     "attraction": 5
+  },
+  "responses": {
+    "hello": "Clark smiles warmly and greets you.",
+    "fight": "Superman squares his shoulders, ready for action.",
+    "kryptonite": "He pales at the mention of his only weakness.",
+    "liam": "Clark looks puzzled. 'I'm not sure who Liam is,' he says.",
+    "lex": "His expression hardens at the name Lex Luthor.",
+    "default": "Clark isn't sure how to respond to that."
   }
 }

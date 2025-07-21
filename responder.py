@@ -25,6 +25,19 @@ def generate_response(character: Dict, parsed: ParsedInput, memory: Dict[str, in
     name = character.get("name", "Unknown")
     persona = "clark" if memory.get("trust", 0) < 7 else "superman"
 
+    # Check for keyword-based responses first
+    text_lower = parsed.text.lower()
+    responses = character.get("responses", {})
+    for keyword, reply in responses.items():
+        if keyword == "default":
+            continue
+        if keyword in text_lower:
+            return reply
+    if "default" in responses:
+        default_reply = responses["default"]
+    else:
+        default_reply = None
+
     base_response = {
         "question": f"{name} ponders your question thoughtfully.",
         "affection": f"{name} smiles warmly at you.",
@@ -43,4 +56,4 @@ def generate_response(character: Dict, parsed: ParsedInput, memory: Dict[str, in
     if persona_desc:
         base_response = f"[{persona.title()}] {base_response}"
 
-    return base_response
+    return default_reply or base_response
