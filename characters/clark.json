@@ -1,0 +1,21 @@
+{
+  "name": "Clark Kent",
+  "alias": "Superman",
+  "personas": {
+    "clark": {
+      "description": "Mild-mannered reporter hiding his heroic side.",
+      "morality": 8,
+      "flirtiness": 4
+    },
+    "superman": {
+      "description": "Heroic defender of Metropolis.",
+      "morality": 10,
+      "flirtiness": 2
+    }
+  },
+  "emotional_triggers": ["kryptonite", "Lois Lane"],
+  "relationship": {
+    "trust": 5,
+    "attraction": 5
+  }
+}
