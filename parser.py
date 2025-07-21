@@ -2,6 +2,21 @@
 from dataclasses import dataclass
 from typing import Optional
 
+try:
+    import spacy
+except ImportError as e:  # pragma: no cover - guidance for missing dependency
+    raise ImportError(
+        "spaCy is required for parsing. Install it with 'pip install spacy' and "
+        "download the English model via 'python -m spacy download en_core_web_sm'."
+    ) from e
+
+try:
+    nlp = spacy.load("en_core_web_sm")
+except OSError as e:  # pragma: no cover
+    raise OSError(
+        "spaCy model 'en_core_web_sm' not found. Run 'python -m spacy download en_core_web_sm'"
+    ) from e
+
 
 @dataclass
 class ParsedInput:
@@ -14,41 +29,48 @@ class ParsedInput:
 
 
 def parse_input(text: str) -> ParsedInput:
-    """Very naive natural language parser.
+    """Parse user language with spaCy to extract conversation features."""
 
-    This function uses simple keyword heuristics to determine the user's
-    intent, emotion, tone, and target. In a full implementation this would
-    be replaced with a call to a more sophisticated NLP model.
-    """
-    lowered = text.lower()
+    doc = nlp(text)
+    lemmas = {token.lemma_.lower() for token in doc}
 
-    # Determine intent
+    # Determine intent using simple keyword matching on lemmas
     if "?" in text:
         intent = "question"
-    elif any(word in lowered for word in ["love", "like", "adore"]):
-        intent = "affection"
-    elif any(word in lowered for word in ["hate", "dislike"]):
-        intent = "hostile"
+    elif lemmas & {"love", "adore", "kiss", "flirt", "date"}:
+        intent = "flirt"
+    elif lemmas & {"fight", "challenge", "battle", "confront"}:
+        intent = "challenge"
+    elif lemmas & {"comfort", "hug", "console"}:
+        intent = "comfort"
     else:
         intent = "statement"
 
     # Determine emotion
-    if any(word in lowered for word in ["angry", "mad", "furious"]):
-        emotion = "angry"
-    elif any(word in lowered for word in ["happy", "glad", "joy"]):
-        emotion = "happy"
+    if lemmas & {"angry", "mad", "furious"}:
+        emotion = "anger"
+    elif lemmas & {"happy", "glad", "joy", "excited"}:
+        emotion = "joy"
+    elif lemmas & {"sad", "upset", "unhappy"}:
+        emotion = "sadness"
     else:
         emotion = None
 
-    # Determine tone (very simplistic)
-    if any(word in lowered for word in ["please", "kindly"]):
-        tone = "polite"
-    elif any(word in lowered for word in ["now", "immediately"]):
-        tone = "demanding"
+    # Determine tone
+    if lemmas & {"sarcastic", "sarcasm"}:
+        tone = "sarcastic"
+    elif lemmas & {"serious", "solemn"}:
+        tone = "serious"
+    elif lemmas & {"playful", "tease", "joke"}:
+        tone = "playful"
     else:
         tone = None
 
-    # Determine target of interaction (not implemented)
+    # Determine target using named entities
     target = None
+    for ent in doc.ents:
+        if ent.label_ == "PERSON":
+            target = ent.text
+            break
 
     return ParsedInput(text=text, intent=intent, emotion=emotion, tone=tone, target=target)

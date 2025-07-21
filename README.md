@@ -30,3 +30,14 @@ export COMICVINE_API_KEY=18486013de316536659c6d7150a5fe84347ce2a8
 This key will allow the fetch script to communicate with ComicVine. Keep in
 mind that storing API keys in plaintext is not secure; consider using a more
 secure secret management method for real projects.
+
+## Setup
+
+The parser relies on the spaCy NLP library. Install it and the English model:
+
+```bash
+pip install spacy
+python -m spacy download en_core_web_sm
+```
+
+After installation, you can run the simulator and parsing will work properly.
